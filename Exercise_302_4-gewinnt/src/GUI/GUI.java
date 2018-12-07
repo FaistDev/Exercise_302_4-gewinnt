@@ -98,11 +98,21 @@ public class GUI extends JFrame {
 
             busL.Value winner = bl.checkWinner();
             if (winner != busL.Value.EMPTY) {
-                ArrayList<Integer> winCols=bl.getWinCols();
-                ArrayList<Integer> winRows=bl.getWinRows();
-                for (Integer winRow : winRows) {
-                    for (Integer winCol : winCols) {
-                        labels[winRow][winCol].setBackground(Color.orange);
+                ArrayList<Integer> winCols = bl.getWinCols();
+                ArrayList<Integer> winRows = bl.getWinRows();
+                if (winCols.get(0) != winCols.get(1) && winRows.get(0) != winRows.get(1)) {
+                       int rows=winRows.get(0);
+                       int cols=winCols.get(0);
+                       while(rows<labels.length){
+                           labels[rows][cols].setBackground(Color.orange);
+                           rows++;
+                           cols++;
+                       }
+                } else {
+                    for (Integer winRow : winRows) {
+                        for (Integer winCol : winCols) {
+                            labels[winRow][winCol].setBackground(Color.orange);
+                        }
                     }
                 }
                 JOptionPane.showMessageDialog(this, "Player " + winner + " has won the game!");
@@ -116,13 +126,13 @@ public class GUI extends JFrame {
 
     }
 
-    private void redraw(){
-        for(int rows=1;rows<labels.length;rows++){
-            for(int col=0; col<labels.length;col++){
+    private void redraw() {
+        for (int rows = 1; rows < labels.length; rows++) {
+            for (int col = 0; col < labels.length; col++) {
                 JLabel label = labels[rows][col];
                 label.setBackground(Color.GRAY);
             }
         }
     }
-    
+
 }
