@@ -7,6 +7,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
+import java.util.ArrayList;
 import static javafx.scene.input.KeyCode.O;
 import static javafx.scene.input.KeyCode.X;
 import javax.swing.JButton;
@@ -97,6 +98,13 @@ public class GUI extends JFrame {
 
             busL.Value winner = bl.checkWinner();
             if (winner != busL.Value.EMPTY) {
+                ArrayList<Integer> winCols=bl.getWinCols();
+                ArrayList<Integer> winRows=bl.getWinRows();
+                for (Integer winRow : winRows) {
+                    for (Integer winCol : winCols) {
+                        labels[winRow][winCol].setBackground(Color.orange);
+                    }
+                }
                 JOptionPane.showMessageDialog(this, "Player " + winner + " has won the game!");
                 bl.reset();
                 this.redraw();
