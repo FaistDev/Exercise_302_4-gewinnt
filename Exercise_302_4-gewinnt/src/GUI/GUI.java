@@ -28,6 +28,8 @@ import jdk.internal.org.objectweb.asm.tree.analysis.Value;
  * @author Ben
  */
 public class GUI extends JFrame {
+    
+    private Boolean computer=true;
 
     private BL bl = new BL();
     private JLabel[][] labels = new JLabel[7][7];
