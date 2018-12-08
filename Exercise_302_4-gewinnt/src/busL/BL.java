@@ -6,6 +6,8 @@
 package busL;
 
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -17,6 +19,10 @@ public class BL {
     private Value currentPlayer;
     ArrayList<Integer> winRows = new ArrayList<Integer>();
     ArrayList<Integer> winCols = new ArrayList<Integer>();
+    private int moveCount = 0;
+    private int computersLastRow = -1;
+    private int computersLastCol = -1;
+    private int blocksVertikalInRow=0;
 
     public BL() {
         this.reset();
@@ -167,11 +173,11 @@ public class BL {
                 }
             }
         }
-        
+
         //diagonal
         //right to left
         for (int rows = 1; rows < field.length - 3; rows++) {
-            for (int cols = field.length-1; cols > 2; cols--) {
+            for (int cols = field.length - 1; cols > 2; cols--) {
                 countX = 1;
                 countO = 1;
                 winCols.clear();
@@ -181,7 +187,7 @@ public class BL {
                     winRows.add(rows);
                     int r = rows + 1;
                     int c = cols - 1;
-                    while (c >= 0 && r<field.length) {
+                    while (c >= 0 && r < field.length) {
                         if (field[rows][cols] == field[r][c]) {
                             winCols.add(c);
                             winRows.add(r);
@@ -218,4 +224,68 @@ public class BL {
     public ArrayList<Integer> getWinRows() {
         return this.winRows;
     }
+
+    //Computer
+    public void compute() throws Exception {
+        if (computersLastRow != -1) {
+            int freeField = blocksVertikalInRow;
+            for (int rows = computersLastRow - 1; rows > 0; rows--) {
+                if (field[rows][computersLastCol] == Value.EMPTY) {
+                    freeField++;
+                }else{
+                    blocksVertikalInRow=0;
+                    break;
+                }
+            }
+            if (freeField >= 4) {
+                computersLastRow = BL.this.makeMove(computersLastCol);
+                blocksVertikalInRow++;
+                System.out.println("Here are my rows+cols: " + computersLastRow + " " + computersLastCol);
+                BL.this.countMoveCountUp();
+            } else {
+                this.searchNewStartPos();
+            }
+        } else {
+            this.searchNewStartPos();
+        }
+    }
+
+    private void searchNewStartPos() throws Exception {
+        one:
+        for (int cols = 0; cols < field.length; cols++) {
+            two:
+            for (int rows = field.length - 1; rows > 3; rows--) {
+                if (field[rows][cols] == Value.EMPTY) {
+                    computersLastRow = BL.this.makeMove(cols);
+                    computersLastCol = cols;
+                    blocksVertikalInRow++;
+                    System.out.println("Here are my rows+cols: " + computersLastRow + " " + computersLastCol);
+                    BL.this.countMoveCountUp();
+                    break one;
+                }
+            }
+        }
+    }
+
+    public int getMoveCount() {
+        return moveCount;
+    }
+
+    public void countMoveCountUp() {
+        moveCount++;
+    }
+
+    public int getComputersLastRow() {
+        return computersLastRow;
+    }
+
+    public int getComputersLastCol() {
+        return computersLastCol;
+    }
+
+    public Value getCurrentPlayer() {
+        return currentPlayer;
+    }
+
+    
 }
