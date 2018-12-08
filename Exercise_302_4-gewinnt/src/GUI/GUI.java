@@ -100,14 +100,15 @@ public class GUI extends JFrame {
             if (winner != busL.Value.EMPTY) {
                 ArrayList<Integer> winCols = bl.getWinCols();
                 ArrayList<Integer> winRows = bl.getWinRows();
-                if (winCols.get(0) != winCols.get(1) && winRows.get(0) != winRows.get(1)) {
-                       int rows=winRows.get(0);
-                       int cols=winCols.get(0);
-                       while(rows<labels.length){
-                           labels[rows][cols].setBackground(Color.orange);
-                           rows++;
-                           cols++;
-                       }
+                
+                if (winRows.size()!=1 && winCols.size()!=1) {
+                    int rows = 0;
+                    int cols = 0;
+                    while (rows < winRows.size()) {
+                        labels[winRows.get(rows)][winCols.get(cols)].setBackground(Color.orange);
+                        rows++;
+                        cols++;
+                    }
                 } else {
                     for (Integer winRow : winRows) {
                         for (Integer winCol : winCols) {

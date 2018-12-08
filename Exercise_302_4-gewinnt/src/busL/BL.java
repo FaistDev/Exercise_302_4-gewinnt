@@ -141,7 +141,7 @@ public class BL {
                     winRows.add(rows);
                     int r = rows + 1;
                     int c = cols + 1;
-                    while (c < field.length-3) {
+                    while (c < field.length) {
                         if (field[rows][cols] == field[r][c]) {
                             winCols.add(c);
                             winRows.add(r);
@@ -154,6 +154,46 @@ public class BL {
                                     break;
                             }
                             c++;
+                            r++;
+                        } else {
+                            break;
+                        }
+                    }
+                    if (countX == 4) {
+                        return Value.X;
+                    } else if (countO == 4) {
+                        return Value.O;
+                    }
+                }
+            }
+        }
+        
+        //diagonal
+        //right to left
+        for (int rows = 1; rows < field.length - 3; rows++) {
+            for (int cols = field.length-1; cols > 2; cols--) {
+                countX = 1;
+                countO = 1;
+                winCols.clear();
+                winRows.clear();
+                if (field[rows][cols] != Value.EMPTY) {
+                    winCols.add(cols);
+                    winRows.add(rows);
+                    int r = rows + 1;
+                    int c = cols - 1;
+                    while (c >= 0 && r<field.length) {
+                        if (field[rows][cols] == field[r][c]) {
+                            winCols.add(c);
+                            winRows.add(r);
+                            switch (field[rows][cols]) {
+                                case X:
+                                    countX++;
+                                    break;
+                                case O:
+                                    countO++;
+                                    break;
+                            }
+                            c--;
                             r++;
                         } else {
                             break;
