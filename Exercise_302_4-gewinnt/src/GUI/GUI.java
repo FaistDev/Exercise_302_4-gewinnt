@@ -178,22 +178,6 @@ public class GUI extends JFrame {
         }
     }
 
-    private void whatDoesTheComputer() {
-        Thread computer = new Thread() {
-            @Override
-            public void run() {
-                while (true) {
-                    if (bl.getMoveCount() % 2 == 0 && bl.getMoveCount() != 0) {
-                        System.out.println("Wait for cols+rows");
-                        System.out.println("Is it here?");
-
-                        labels[bl.getComputersLastRow()][bl.getComputersLastCol()].setBackground(Color.blue);
-                    }
-                }
-            }
-
-        };
-        computer.start();
-    }
+    
 
 }

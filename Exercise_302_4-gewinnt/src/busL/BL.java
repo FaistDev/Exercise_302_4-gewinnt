@@ -19,10 +19,10 @@ public class BL {
     private Value currentPlayer;
     ArrayList<Integer> winRows = new ArrayList<Integer>();
     ArrayList<Integer> winCols = new ArrayList<Integer>();
-    private int moveCount = 0;
+    //private int moveCount = 0;
     private int computersLastRow = -1;
     private int computersLastCol = -1;
-    private int blocksVertikalInRow=0;
+    private int blocksVertikalInRow = 0;
 
     public BL() {
         this.reset();
@@ -228,26 +228,64 @@ public class BL {
     //Computer
     public void compute() throws Exception {
         if (computersLastRow != -1) {
-            int freeField = blocksVertikalInRow;
-            for (int rows = computersLastRow - 1; rows > 0; rows--) {
-                if (field[rows][computersLastCol] == Value.EMPTY) {
-                    freeField++;
-                }else{
-                    blocksVertikalInRow=0;
-                    break;
+            int defenseCol = this.defense();
+            if (defenseCol == 23) {
+                int freeField = blocksVertikalInRow;
+                for (int rows = computersLastRow - 1; rows > 0; rows--) {
+                    if (field[rows][computersLastCol] == Value.EMPTY) {
+                        freeField++;
+                    } else {
+                        blocksVertikalInRow = 0;
+                        break;
+                    }
                 }
-            }
-            if (freeField >= 4) {
-                computersLastRow = BL.this.makeMove(computersLastCol);
-                blocksVertikalInRow++;
-                System.out.println("Here are my rows+cols: " + computersLastRow + " " + computersLastCol);
-                BL.this.countMoveCountUp();
+                if (freeField >= 4) {
+                    computersLastRow = BL.this.makeMove(computersLastCol);
+                    blocksVertikalInRow++;
+                    System.out.println("Here are my rows+cols: " + computersLastRow + " " + computersLastCol);
+                    //BL.this.countMoveCountUp();
+                } else {
+                    this.searchNewStartPos();
+                }
             } else {
-                this.searchNewStartPos();
+                computersLastRow = BL.this.makeMove(defenseCol);
+                computersLastCol = defenseCol;
+                blocksVertikalInRow=0;
             }
         } else {
             this.searchNewStartPos();
         }
+    }
+
+    private int defense() {
+        int inRowX = 1;
+        for (int cols = 0; cols < field.length; cols++) {
+            for (int rows = field.length - 1; rows > 3; rows--) {
+                if (field[rows][cols] == Value.X) {
+                    for (int r = rows - 1; r > 0; r--) {
+                        if (field[r][cols] == Value.X) {
+                            inRowX++;
+                        } else {
+                            break;
+                        }
+                    }
+                    if (inRowX == 3) {
+                        try {
+                            if (field[rows - 3][cols] == Value.EMPTY) {
+                                //Defense
+                                System.out.println("Defense in Row: " + rows + " Col: " + cols);
+                                return cols;
+                            }
+                        } catch (Exception e) {
+                        }
+                        inRowX = 1;
+                    } else {
+                        inRowX = 1;
+                    }
+                }
+            }
+        }
+        return 23;
     }
 
     private void searchNewStartPos() throws Exception {
@@ -260,21 +298,21 @@ public class BL {
                     computersLastCol = cols;
                     blocksVertikalInRow++;
                     System.out.println("Here are my rows+cols: " + computersLastRow + " " + computersLastCol);
-                    BL.this.countMoveCountUp();
+                    //  BL.this.countMoveCountUp();
                     break one;
                 }
             }
         }
     }
 
-    public int getMoveCount() {
+    /*public int getMoveCount() {
         return moveCount;
     }
 
     public void countMoveCountUp() {
         moveCount++;
     }
-
+     */
     public int getComputersLastRow() {
         return computersLastRow;
     }
@@ -287,5 +325,4 @@ public class BL {
         return currentPlayer;
     }
 
-    
 }
