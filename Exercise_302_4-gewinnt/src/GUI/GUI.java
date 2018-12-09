@@ -165,14 +165,14 @@ public class GUI extends JFrame {
                     bl.reset();
                     GUI.this.redraw();
                 } else {
-                    if (bl.getCurrentPlayer() == busL.Value.O) {
+                    /*if (bl.getCurrentPlayer() == busL.Value.O) {
                         try {
                             bl.compute();
                         } catch (Exception ex) {
                             Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
                         }
                         GUI.this.drawIt(bl.getComputersLastRow(), bl.getComputersLastCol());
-                    }
+                    }*/
                 }
 
             }
