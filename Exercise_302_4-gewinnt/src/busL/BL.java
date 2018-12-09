@@ -5,6 +5,12 @@
  */
 package busL;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,12 +25,17 @@ public class BL {
     private Value currentPlayer;
     ArrayList<Integer> winRows = new ArrayList<Integer>();
     ArrayList<Integer> winCols = new ArrayList<Integer>();
-    //private int moveCount = 0;
+    private int moveCount = 0;
     private int computersLastRow = -1;
     private int computersLastCol = -1;
     private int blocksVertikalInRow = 0;
     private int lastFightRow = -1;
     private int lastFightCol = -1;
+    private ArrayList<Block> allBlocks = new ArrayList<>();
+    private ArrayList<Block> thisGameBlocks = new ArrayList<>();
+    private Block lastBlock;
+    private int usersLastRow = -1;
+    private int userLastCol = -1;
 
     public BL() {
         this.reset();
@@ -37,6 +48,10 @@ public class BL {
             }
         }
         currentPlayer = Value.X;
+        thisGameBlocks=new ArrayList<>();
+        lastBlock=null;
+        userLastCol=-1;
+        usersLastRow=-1;
     }
 
     public int makeMove(int col) throws Exception {
@@ -47,6 +62,37 @@ public class BL {
                 field[row][col] = currentPlayer;
                 labelRow = row;
                 setPlayer = true;
+
+                if (moveCount != 0) {
+                    if (currentPlayer == Value.O) {
+                        lastBlock = new Block(row, col);
+                    } else {
+                        userLastCol = col;
+                        usersLastRow = row;
+                        boolean newBlock = true;
+                        Block oldBlock = null;
+                        for (Block block : allBlocks) {
+                            if (block.getComRow() == lastBlock.getComRow() && block.getComCol() == lastBlock.getComCol() && block.getReactRow() == row && block.getReactCol() == col) {
+                                newBlock = false;
+                                oldBlock = block;
+                                break;
+                            }
+                        }
+                        if (newBlock) {
+                            lastBlock.setReactRow(row);
+                            lastBlock.setReactCol(col);
+                            allBlocks.add(lastBlock);
+                            thisGameBlocks.add(lastBlock);
+                            lastBlock = null;
+                        } else {
+                            oldBlock.usedCountUp();
+                            Block.blocksCountUp();
+                            thisGameBlocks.add(oldBlock);
+                            lastBlock = null;
+                        }
+                    }
+                }
+                moveCount++;
                 break;
             }
         }
@@ -62,6 +108,30 @@ public class BL {
 
     public Value getValueAt(int row, int col) {
         return field[row][col];
+    }
+
+    private void playerWonGame() {
+        for (Block block : thisGameBlocks) {
+            block.countWinsUp();
+        }
+        Block.countGamesUp();
+    }
+
+    public void saveLearning() throws IOException {
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File("computersBrain.bin")));
+        for (Block b : allBlocks) {
+            oos.writeObject(b);
+        }
+        oos.flush();
+        oos.close();
+    }
+
+    public void loadLearning() throws Exception {
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(new File("computersBrain.bin")));
+        Object b = null;
+        while ((b = ois.readObject()) != null) {
+            allBlocks.add((Block) b);
+        }
     }
 
     public Value checkWinner() {
@@ -94,8 +164,10 @@ public class BL {
                         }
                     }
                     if (countX == 4) {
+                        playerWonGame();
                         return Value.X;
                     } else if (countO == 4) {
+                        Block.countGamesUp();
                         return Value.O;
                     }
                 }
@@ -128,8 +200,10 @@ public class BL {
                         }
                     }
                     if (countX == 4) {
+                        playerWonGame();
                         return Value.X;
                     } else if (countO == 4) {
+                        Block.countGamesUp();
                         return Value.O;
                     }
                 }
@@ -168,8 +242,10 @@ public class BL {
                         }
                     }
                     if (countX == 4) {
+                        playerWonGame();
                         return Value.X;
                     } else if (countO == 4) {
+                        Block.countGamesUp();
                         return Value.O;
                     }
                 }
@@ -208,8 +284,10 @@ public class BL {
                         }
                     }
                     if (countX == 4) {
+                        playerWonGame();
                         return Value.X;
                     } else if (countO == 4) {
+                        Block.countGamesUp();
                         return Value.O;
                     }
                 }
@@ -232,24 +310,50 @@ public class BL {
         if (computersLastRow != -1) {
             int defenseCol = this.defense();
             if (defenseCol == 23) {
-                int freeField = blocksVertikalInRow;
-                for (int rows = lastFightRow - 1; rows > 0; rows--) {
-                    if (field[rows][lastFightCol] == Value.EMPTY) {
-                        freeField++;
-                    } else {
-                        blocksVertikalInRow = 0;
-                        break;
+                //Think about: Do I know already a block to set, because I remember that from expirience
+                ArrayList<Block> possibleBlocks = new ArrayList<>();
+                for (Block block : allBlocks) {
+                    if (block.getComRow() == usersLastRow && block.getComCol() == userLastCol) {
+                        //If I know some, remember all shortly;
+                        //Check if the block can be set where it should be
+                        if (field[block.getReactRow()][block.getReactCol()] == Value.EMPTY && (block.getReactRow() == field.length - 1 ? true : field[block.getReactRow() + 1][block.getReactCol()] != Value.EMPTY)) {
+                            possibleBlocks.add(block);
+                        }
                     }
                 }
-                if (freeField >= 4) {
-                    computersLastRow = BL.this.makeMove(lastFightCol);
+                if (possibleBlocks.size() != 0) {
+                    //Now check which block is the best to use
+                    Block bestBlock = possibleBlocks.get(0);
+                    for (Block possibleBlock : possibleBlocks) {
+                        if (possibleBlock.calculateSenseValue() > bestBlock.calculateSenseValue()) {
+                            bestBlock = possibleBlock;
+                        }
+                    }
+                    System.out.println("Hey! I remembered that I can set a block at: "+bestBlock.getReactRow()+"/"+bestBlock.getReactCol());
+                    computersLastRow = BL.this.makeMove(bestBlock.getReactCol());
                     lastFightRow = computersLastRow;
-                    computersLastCol = lastFightCol;
-                    blocksVertikalInRow++;
-                    System.out.println("Here are my rows+cols: " + computersLastRow + " " + computersLastCol);
-                    //BL.this.countMoveCountUp();
+                    computersLastCol = bestBlock.getReactCol();
                 } else {
-                    this.searchNewStartPos();
+
+                    int freeField = blocksVertikalInRow;
+                    for (int rows = lastFightRow - 1; rows > 0; rows--) {
+                        if (field[rows][lastFightCol] == Value.EMPTY) {
+                            freeField++;
+                        } else {
+                            blocksVertikalInRow = 0;
+                            break;
+                        }
+                    }
+                    if (freeField >= 4) {
+                        computersLastRow = BL.this.makeMove(lastFightCol);
+                        lastFightRow = computersLastRow;
+                        computersLastCol = lastFightCol;
+                        blocksVertikalInRow++;
+                        System.out.println("Here are my rows+cols: " + computersLastRow + " " + computersLastCol);
+                        //BL.this.countMoveCountUp();
+                    } else {
+                        this.searchNewStartPos();
+                    }
                 }
             } else {
                 computersLastRow = BL.this.makeMove(defenseCol);

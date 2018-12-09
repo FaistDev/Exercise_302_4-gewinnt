@@ -7,6 +7,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,17 +36,21 @@ public class GUI extends JFrame {
     private JLabel[][] labels = new JLabel[7][7];
 
     public static void main(String[] args) {
-        GUI gui = new GUI();
+        try {
+            GUI gui = new GUI();
+        } catch (Exception ex) {
+            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
-    public GUI() {
+    public GUI() throws Exception {
         super("4-Gewinnt");
         initComp();
         this.setVisible(true);
         this.setSize(500, 500);
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        //this.whatDoesTheComputer();
+        bl.loadLearning();
     }
 
     private void initComp() {
@@ -150,6 +155,11 @@ public class GUI extends JFrame {
                         }
                     }
                     JOptionPane.showMessageDialog(GUI.this, "Player " + winner + " has won the game!");
+                    try {
+                        bl.saveLearning();
+                    } catch (IOException ex) {
+                        Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                     bl.reset();
                     GUI.this.redraw();
                 } else {
