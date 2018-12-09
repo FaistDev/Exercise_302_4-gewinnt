@@ -1,6 +1,7 @@
 package GUI;
 
 import busL.BL;
+import busL.Block;
 import java.awt.Button;
 import java.awt.Color;
 import java.awt.Component;
@@ -156,6 +157,7 @@ public class GUI extends JFrame {
                     }
                     JOptionPane.showMessageDialog(GUI.this, "Player " + winner + " has won the game!");
                     try {
+                        Block.countGamesUp();
                         bl.saveLearning();
                     } catch (IOException ex) {
                         Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);

@@ -5,6 +5,8 @@
  */
 package busL;
 
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 /**
@@ -12,14 +14,15 @@ import java.io.Serializable;
  * @author Ben
  */
 public class Block implements Serializable {
+
     private int comRow;
     private int comCol;
     private int reactRow;
     private int reactCol;
-    private int usedCount;
-    private static int blocksCount=1;
-    private int wonGames;
-    private static int games=1;
+    private double usedCount;
+    private static double blocksCount;
+    private double wonGames;
+    private static double games;
 
     public Block(int comRow, int comCol) {
         this.comRow = comRow;
@@ -27,26 +30,26 @@ public class Block implements Serializable {
         usedCount++;
         blocksCount++;
     }
-    
-    public double calculateSenseValue(){
-        double w1 = usedCount/blocksCount;
-        double w2 = wonGames/games;
-        return (w1+w2)/2;
+
+    public double calculateSenseValue() {
+        double w1 = usedCount / blocksCount;
+        double w2 = wonGames / games;
+        return (w1 + w2 * 2) / 2;
     }
-    
-    public void usedCountUp(){
+
+    public void usedCountUp() {
         usedCount++;
     }
-    
-    public static void blocksCountUp(){
+
+    public static void blocksCountUp() {
         blocksCount++;
     }
-    
-    public static void countGamesUp(){
+
+    public static void countGamesUp() {
         games++;
     }
-    
-    public void countWinsUp(){
+
+    public void countWinsUp() {
         wonGames++;
     }
 
@@ -57,8 +60,6 @@ public class Block implements Serializable {
     public void setReactCol(int reactCol) {
         this.reactCol = reactCol;
     }
-    
-    
 
     public int getComRow() {
         return comRow;
@@ -76,21 +77,53 @@ public class Block implements Serializable {
         return reactCol;
     }
 
-    public int getUsedCount() {
+    public double getUsedCount() {
         return usedCount;
     }
 
-    public static int getBlocksCount() {
+    public static double getBlocksCount() {
         return blocksCount;
     }
 
-    public int getWonGames() {
+    public double getWonGames() {
         return wonGames;
     }
 
-    public static int getGames() {
+    public static double getGames() {
         return games;
     }
-    
-    
+
+    public String toString() {
+        return String.format("Players: %d/%d\nComputersReact: %d/%d\nUsedThisMove: %.2f"
+                + "\nMovesSum: %.2f\nWonWithThisMove: %.2f\nGamesInSum: %.2f\nSense: %.2f",
+                comRow, comCol, reactRow, reactCol, usedCount, Block.blocksCount, wonGames, Block.games, calculateSenseValue());
+    }
+
+    private void writeObject(ObjectOutputStream os) {
+        try {
+            os.defaultWriteObject();
+            os.writeDouble(Block.blocksCount);
+            os.writeDouble(Block.games);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void readObject(ObjectInputStream is) {
+        try {
+            is.defaultReadObject();
+            Block.setBlocks(is.readDouble());
+            Block.setGames(is.readDouble());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void setGames(double games) {
+        Block.games = games;
+    }
+
+    private static void setBlocks(double blocks) {
+        Block.blocksCount = blocks;
+    }
 }

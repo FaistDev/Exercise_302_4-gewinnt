@@ -48,10 +48,10 @@ public class BL {
             }
         }
         currentPlayer = Value.X;
-        thisGameBlocks=new ArrayList<>();
-        lastBlock=null;
-        userLastCol=-1;
-        usersLastRow=-1;
+        thisGameBlocks = new ArrayList<>();
+        lastBlock = null;
+        userLastCol = -1;
+        usersLastRow = -1;
     }
 
     public int makeMove(int col) throws Exception {
@@ -223,7 +223,7 @@ public class BL {
                     winRows.add(rows);
                     int r = rows + 1;
                     int c = cols + 1;
-                    while (c < field.length) {
+                    while (c < field.length && r < field.length) {
                         if (field[rows][cols] == field[r][c]) {
                             winCols.add(c);
                             winRows.add(r);
@@ -329,7 +329,7 @@ public class BL {
                             bestBlock = possibleBlock;
                         }
                     }
-                    System.out.println("Hey! I remembered that I can set a block at: "+bestBlock.getReactRow()+"/"+bestBlock.getReactCol());
+                    System.out.println("Hey! I remembered that I can set a block at:\n" + bestBlock.toString());
                     computersLastRow = BL.this.makeMove(bestBlock.getReactCol());
                     lastFightRow = computersLastRow;
                     computersLastCol = bestBlock.getReactCol();
