@@ -23,6 +23,8 @@ public class BL {
     private int computersLastRow = -1;
     private int computersLastCol = -1;
     private int blocksVertikalInRow = 0;
+    private int lastFightRow = -1;
+    private int lastFightCol = -1;
 
     public BL() {
         this.reset();
@@ -231,8 +233,8 @@ public class BL {
             int defenseCol = this.defense();
             if (defenseCol == 23) {
                 int freeField = blocksVertikalInRow;
-                for (int rows = computersLastRow - 1; rows > 0; rows--) {
-                    if (field[rows][computersLastCol] == Value.EMPTY) {
+                for (int rows = lastFightRow - 1; rows > 0; rows--) {
+                    if (field[rows][lastFightCol] == Value.EMPTY) {
                         freeField++;
                     } else {
                         blocksVertikalInRow = 0;
@@ -240,7 +242,9 @@ public class BL {
                     }
                 }
                 if (freeField >= 4) {
-                    computersLastRow = BL.this.makeMove(computersLastCol);
+                    computersLastRow = BL.this.makeMove(lastFightCol);
+                    lastFightRow = computersLastRow;
+                    computersLastCol = lastFightCol;
                     blocksVertikalInRow++;
                     System.out.println("Here are my rows+cols: " + computersLastRow + " " + computersLastCol);
                     //BL.this.countMoveCountUp();
@@ -249,8 +253,12 @@ public class BL {
                 }
             } else {
                 computersLastRow = BL.this.makeMove(defenseCol);
+                if (computersLastCol == defenseCol) {
+                    blocksVertikalInRow = 0;
+                    lastFightCol = defenseCol;
+                }
                 computersLastCol = defenseCol;
-                blocksVertikalInRow=0;
+
             }
         } else {
             this.searchNewStartPos();
@@ -258,6 +266,7 @@ public class BL {
     }
 
     private int defense() {
+        //Defense against vertikal blocks
         int inRowX = 1;
         for (int cols = 0; cols < field.length; cols++) {
             for (int rows = field.length - 1; rows > 3; rows--) {
@@ -285,6 +294,61 @@ public class BL {
                 }
             }
         }
+
+        //Defense against horizontal Blocks
+        int inColX = 1;
+        for (int rows = 1; rows < field.length; rows++) {
+            for (int cols = 0; cols < field.length; cols++) {
+                if (field[rows][cols] == Value.X) {
+                    for (int c = cols + 1; c < field.length; c++) {
+                        if (field[rows][c] == Value.X) {
+                            inColX++;
+                        } else {
+                            break;
+                        }
+                    }
+                    if (inColX == 3) {
+                        try {
+                            if (rows != field.length - 1) {
+                                if (cols + 3 < field.length) {
+                                    if (field[rows][cols + 3] == Value.EMPTY && field[rows + 1][cols + 3] != Value.EMPTY) {
+                                        //Defense
+                                        System.out.println("Defense in Row: " + rows + " Col: " + cols);
+                                        return cols + 3;
+                                    }
+                                } else {
+                                    if (field[rows][cols - 1] == Value.EMPTY && field[rows + 1][cols - 1] != Value.EMPTY) {
+                                        //Defense
+                                        System.out.println("Defense in Row: " + rows + " Col: " + cols);
+                                        return cols - 1;
+                                    }
+                                }
+                            } else {
+                                if (cols + 3 < field.length) {
+                                    if (field[rows][cols + 3] == Value.EMPTY) {
+                                        //Defense
+                                        System.out.println("Defense in Row: " + rows + " Col: " + cols);
+                                        return cols + 3;
+                                    }
+                                } else {
+                                    if (field[rows][cols - 1] == Value.EMPTY) {
+                                        //Defense
+                                        System.out.println("Defense in Row: " + rows + " Col: " + cols);
+                                        return cols - 1;
+                                    }
+                                }
+                            }
+
+                        } catch (Exception e) {
+
+                        }
+                        inColX = 1;
+                    } else {
+                        inColX = 1;
+                    }
+                }
+            }
+        }
         return 23;
     }
 
@@ -296,6 +360,8 @@ public class BL {
                 if (field[rows][cols] == Value.EMPTY) {
                     computersLastRow = BL.this.makeMove(cols);
                     computersLastCol = cols;
+                    lastFightRow = computersLastRow;
+                    lastFightCol = computersLastCol;
                     blocksVertikalInRow++;
                     System.out.println("Here are my rows+cols: " + computersLastRow + " " + computersLastCol);
                     //  BL.this.countMoveCountUp();
