@@ -23,18 +23,18 @@ public class BL {
 
     private Value[][] field = new Value[7][7];
     private Value currentPlayer;
-    ArrayList<Integer> winRows = new ArrayList<Integer>();
+    ArrayList<Integer> winRows = new ArrayList<Integer>();//Für die Orange hervorhebung;
     ArrayList<Integer> winCols = new ArrayList<Integer>();
-    private int moveCount = 0;
-    private int computersLastRow = -1;
+    private int moveCount = 0;//Fürs Machine Learning;
+    private int computersLastRow = -1;//Damit die GUI weiß, was sie zeigen soll;
     private int computersLastCol = -1;
-    private int blocksVertikalInRow = 0;
-    private int lastFightRow = -1;
+    private int blocksVertikalInRow = 0;//Damit er sich merkt, wieviele er schon in einer Reihe hat;
+    private int lastFightRow = -1;//Falls er verdeitigen muss, ändert sich die computerLastRow, damit er weiß wo er fortsetzten soll;
     private int lastFightCol = -1;
-    private ArrayList<Block> allBlocks = new ArrayList<>();
-    private ArrayList<Block> thisGameBlocks = new ArrayList<>();
-    private Block lastBlock;
-    private int usersLastRow = -1;
+    private ArrayList<Block> allBlocks = new ArrayList<>();//Computersgehirn;
+    private ArrayList<Block> thisGameBlocks = new ArrayList<>();//temporäresch Gehirn;
+    private Block lastBlock;//Block mit den Daten des Value.O (also Computer sein move);
+    private int usersLastRow = -1; //Merkt sich letzten Value.X move; für die Block-Abfrage
     private int userLastCol = -1;
 
     public BL() {
@@ -63,22 +63,22 @@ public class BL {
                 labelRow = row;
                 setPlayer = true;
 
-                if (moveCount != 0) {
+                if (moveCount != 0) {//Erster Move wird nicht gespeichert
                     if (currentPlayer == Value.O) {
-                        lastBlock = new Block(row, col);
-                    } else {
+                        lastBlock = new Block(row, col);//Block mit Daten von Value.O
+                    } else {//Wenn Value.X dran ist
                         userLastCol = col;
                         usersLastRow = row;
                         boolean newBlock = true;
                         Block oldBlock = null;
-                        for (Block block : allBlocks) {
+                        for (Block block : allBlocks) {//Erkennen ob bereits eine gleiche Information besteht
                             if (block.getComRow() == lastBlock.getComRow() && block.getComCol() == lastBlock.getComCol() && block.getReactRow() == row && block.getReactCol() == col) {
                                 newBlock = false;
                                 oldBlock = block;
                                 break;
                             }
                         }
-                        if (newBlock) {
+                        if (newBlock) {//Falls noch kein Block exitiert
                             lastBlock.setReactRow(row);
                             lastBlock.setReactCol(col);
                             allBlocks.add(lastBlock);
@@ -305,17 +305,15 @@ public class BL {
         return this.winRows;
     }
 
-    //Computer
+    //Computer Logik
     public void compute() throws Exception {
         if (computersLastRow != -1) {
             int defenseCol = this.defense();
-            if (defenseCol == 23) {
-                //Think about: Do I know already a block to set, because I remember that from expirience
+            if (defenseCol == 23) {//Verdeitigung hat höchste Priorität
                 ArrayList<Block> possibleBlocks = new ArrayList<>();
                 for (Block block : allBlocks) {
                     if (block.getComRow() == usersLastRow && block.getComCol() == userLastCol) {
-                        //If I know some, remember all shortly;
-                        //Check if the block can be set where it should be
+                        //Gibt es Daten, wie der Computer auf den Move des Nutzers reagieren soll?
                         if (field[block.getReactRow()][block.getReactCol()] == Value.EMPTY && (block.getReactRow() == field.length - 1 ? true : field[block.getReactRow() + 1][block.getReactCol()] != Value.EMPTY)) {
                             possibleBlocks.add(block);
                         }
@@ -334,7 +332,8 @@ public class BL {
                     lastFightRow = computersLastRow;
                     computersLastCol = bestBlock.getReactCol();
                 } else {
-
+                    //Wenn es keine Daten gibt, herkömliche Logik
+                    //Er baut seine Blöcke nur Vertikal
                     int freeField = blocksVertikalInRow;
                     for (int rows = lastFightRow - 1; rows > 0; rows--) {
                         if (field[rows][lastFightCol] == Value.EMPTY) {
@@ -356,6 +355,7 @@ public class BL {
                     }
                 }
             } else {
+                //Falls er verdeitigen muss
                 computersLastRow = BL.this.makeMove(defenseCol);
                 if (computersLastCol == defenseCol) {
                     blocksVertikalInRow = 0;

@@ -31,7 +31,10 @@ import jdk.internal.org.objectweb.asm.tree.analysis.Value;
  */
 public class GUI extends JFrame {
 
-    private Boolean computer = true;
+    /* Ich war ein wenig übermotiviert
+    und habe versucht eine KI zu implementieren
+    welche dazu lernen soll -> tut sie auch, aber sie ist etwas dumm :)
+    Leider hat der Code durch diese "Spielerei" an Sauberkeit verloren*/
 
     private BL bl = new BL();
     private JLabel[][] labels = new JLabel[7][7];
@@ -106,7 +109,6 @@ public class GUI extends JFrame {
 
     private void drawIt(int labelRow, int colum) {
         busL.Value val = bl.getValueAt(labelRow, colum);
-        // bl.countMoveCountUp();
         Thread thread = new Thread() {
             public void run() {
                 for (int row = 1; row < labelRow; row++) {
@@ -165,13 +167,14 @@ public class GUI extends JFrame {
                     bl.reset();
                     GUI.this.redraw();
                 } else {
-                    if (bl.getCurrentPlayer() == busL.Value.O) {
+                    //Falls das Spiel nicht beendet ist:
+                    if (bl.getCurrentPlayer() == busL.Value.O) {//Prüfen ob Computer dran ist
                         try {
-                            bl.compute();
+                            bl.compute();//Computer Logik ausfürhen
                         } catch (Exception ex) {
                             Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
                         }
-                        GUI.this.drawIt(bl.getComputersLastRow(), bl.getComputersLastCol());
+                        GUI.this.drawIt(bl.getComputersLastRow(), bl.getComputersLastCol());//Darstellung vom ComputerMove
                     }
                 }
 

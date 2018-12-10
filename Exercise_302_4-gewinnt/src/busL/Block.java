@@ -14,15 +14,15 @@ import java.io.Serializable;
  * @author Ben
  */
 public class Block implements Serializable {
-
-    private int comRow;
+//Beim Lernen / Beim Nutzen
+    private int comRow; //Wo hat der Computer gesetzt / Jetzt hat der Nutzer seinen Block hier gesetzt
     private int comCol;
-    private int reactRow;
+    private int reactRow;//Wie hat der Nutzer drauf reagiert / Ich regiere so wie der Nutzer damals auf mich
     private int reactCol;
-    private double usedCount;
-    private static double blocksCount;
-    private double wonGames;
-    private static double games;
+    private double usedCount;//Wie oft habe ich den Block schon verwendet
+    private static double blocksCount;//Wieviele Blöcke wurden insgesamt gesetzt
+    private double wonGames;//Wie oft habe ich gewonnen, nachdem ich den Block gesetzt hab
+    private static double games;//Gesamt Anzahl an Spielen
 
     public Block(int comRow, int comCol) {
         this.comRow = comRow;
