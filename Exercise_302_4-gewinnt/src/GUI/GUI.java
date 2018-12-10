@@ -86,7 +86,7 @@ public class GUI extends JFrame {
                 label.setForeground(Color.white);
                 label.setHorizontalAlignment(JLabel.CENTER);
                 label.setName(rows + "" + cols);
-                label.setText(rows + "" + cols);
+               // label.setText(rows + "" + cols);
                 container.add(label);
                 labels[rows][cols] = label;
             }

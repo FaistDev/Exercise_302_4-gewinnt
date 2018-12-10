@@ -52,6 +52,7 @@ public class BL {
         lastBlock = null;
         userLastCol = -1;
         usersLastRow = -1;
+        moveCount=0;
     }
 
     public int makeMove(int col) throws Exception {
