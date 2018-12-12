@@ -5,6 +5,11 @@
  */
 package busL;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.ArrayList;
 
 /**
@@ -29,6 +34,32 @@ public class BL {
             }
         }
         currentPlayer = Value.X;
+    }
+
+    public void appendToCsv(int won) throws Exception {
+        BufferedWriter bw = new BufferedWriter(new FileWriter(new File("trainingdata4gewinnt.csv"),true));
+        String text = "";
+        for (int rows = 1; rows < field.length - 1; rows++) {
+            for (int col = 0; col < field.length - 1; col++) {
+                if (!text.equals("")) {
+                    text += ",";
+                }
+                switch (field[rows][col]) {
+                    case X:
+                        text += "-1";
+                        break;
+                    case O:
+                        text += "1";
+                        break;
+                    case EMPTY:
+                        text += "0";
+                        break;
+                }
+            }
+        }
+        bw.write(text + "," + won+"\n");
+        bw.flush();
+        bw.close();
     }
 
     public int makeMove(int col) throws Exception {
@@ -167,11 +198,11 @@ public class BL {
                 }
             }
         }
-        
+
         //diagonal
         //right to left
         for (int rows = 1; rows < field.length - 3; rows++) {
-            for (int cols = field.length-1; cols > 2; cols--) {
+            for (int cols = field.length - 1; cols > 2; cols--) {
                 countX = 1;
                 countO = 1;
                 winCols.clear();
@@ -181,7 +212,7 @@ public class BL {
                     winRows.add(rows);
                     int r = rows + 1;
                     int c = cols - 1;
-                    while (c >= 0 && r<field.length) {
+                    while (c >= 0 && r < field.length) {
                         if (field[rows][cols] == field[r][c]) {
                             winCols.add(c);
                             winRows.add(r);

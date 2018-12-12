@@ -103,7 +103,7 @@ public class GUI extends JFrame {
                             break;
                     }
                         try {
-                            this.sleep(500);
+                            this.sleep(300);
                         } catch (InterruptedException ex) {
                             Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
                         }
@@ -138,6 +138,18 @@ public class GUI extends JFrame {
                                     labels[winRow][winCol].setBackground(Color.orange);
                                 }
                             }
+                        }
+                        try {
+                            switch (winner) {
+                                case X:
+                                    bl.appendToCsv(-1);
+                                    break;
+                                case O:
+                                    bl.appendToCsv(1);
+                                    break;
+                            }
+                        } catch (Exception exception) {
+                            System.out.println(exception.getMessage());
                         }
                         JOptionPane.showMessageDialog(GUI.this, "Player " + winner + " has won the game!");
                         bl.reset();
