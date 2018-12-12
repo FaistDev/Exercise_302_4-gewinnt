@@ -34,6 +34,7 @@ public class GUI extends JFrame {
 
     public static void main(String[] args) {
         GUI gui = new GUI();
+        gui.runGame();
     }
 
     public GUI() {
@@ -81,6 +82,63 @@ public class GUI extends JFrame {
         }
     }
 
+    private void runGame() {
+        while (bl.checkWinner() == busL.Value.EMPTY) {
+            try {
+                int col = bl.compute();
+                int row = bl.makeMove(col);
+                busL.Value val = bl.getValueAt(row, col);
+                switch (val) {
+                    case X:
+                        labels[row][col].setBackground(Color.red);
+                        break;
+                    case O:
+                        labels[row][col].setBackground(Color.blue);
+                        break;
+                }
+            } catch (Exception ex) {
+                Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex + "\n" + ex.getMessage());
+            }
+        }
+        busL.Value winner = bl.checkWinner();
+        if (winner != busL.Value.EMPTY) {
+            ArrayList<Integer> winCols = bl.getWinCols();
+            ArrayList<Integer> winRows = bl.getWinRows();
+
+            if (winRows.size() != 1 && winCols.size() != 1) {
+                int rows = 0;
+                int cols = 0;
+                while (rows < winRows.size()) {
+                    labels[winRows.get(rows)][winCols.get(cols)].setBackground(Color.orange);
+                    rows++;
+                    cols++;
+                }
+            } else {
+                for (Integer winRow : winRows) {
+                    for (Integer winCol : winCols) {
+                        labels[winRow][winCol].setBackground(Color.orange);
+                    }
+                }
+            }
+            try {
+                switch (winner) {
+                    case X:
+                        bl.appendToCsv(-1);
+                        break;
+                    case O:
+                        bl.appendToCsv(1);
+                        break;
+                }
+            } catch (Exception exception) {
+                System.out.println(exception.getMessage());
+            }
+            JOptionPane.showMessageDialog(GUI.this, "Player " + winner + " has won the game!");
+            bl.reset();
+            GUI.this.redraw();
+            this.runGame();
+        }
+    }
+
     private void onButtonClick(java.awt.event.MouseEvent event) {
         try {
             JButton button = (JButton) event.getSource();
@@ -88,20 +146,18 @@ public class GUI extends JFrame {
             int colum = Integer.parseInt(button.getName());
             int labelRow = bl.makeMove(colum);
             busL.Value val = bl.getValueAt(labelRow, colum);
-            
-            
 
             Thread thread = new Thread() {
                 public void run() {
                     for (int row = 1; row < labelRow; row++) {
                         switch (val) {
-                        case X:
-                            labels[row][colum].setBackground(Color.red);
-                            break;
-                        case O:
-                            labels[row][colum].setBackground(Color.blue);
-                            break;
-                    }
+                            case X:
+                                labels[row][colum].setBackground(Color.red);
+                                break;
+                            case O:
+                                labels[row][colum].setBackground(Color.blue);
+                                break;
+                        }
                         try {
                             this.sleep(300);
                         } catch (InterruptedException ex) {

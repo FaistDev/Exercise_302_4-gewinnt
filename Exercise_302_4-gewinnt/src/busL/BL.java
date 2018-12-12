@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  *
@@ -35,9 +36,17 @@ public class BL {
         }
         currentPlayer = Value.X;
     }
+    
+
+    public int compute() {
+        Random r = new Random();
+        int col;
+        col = r.nextInt((6 - 0) + 1) + 0;
+        return col;
+    }
 
     public void appendToCsv(int won) throws Exception {
-        BufferedWriter bw = new BufferedWriter(new FileWriter(new File("trainingdata4gewinnt.csv"),true));
+        BufferedWriter bw = new BufferedWriter(new FileWriter(new File("trainingdata4gewinnt.csv"), true));
         String text = "";
         for (int rows = 1; rows < field.length - 1; rows++) {
             for (int col = 0; col < field.length - 1; col++) {
@@ -57,7 +66,7 @@ public class BL {
                 }
             }
         }
-        bw.write(text + "," + won+"\n");
+        bw.write(text + "," + won + "\n");
         bw.flush();
         bw.close();
     }
