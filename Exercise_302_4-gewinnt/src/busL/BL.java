@@ -141,7 +141,7 @@ public class BL {
                     winRows.add(rows);
                     int r = rows + 1;
                     int c = cols + 1;
-                    while (c < field.length) {
+                    while (c < field.length && r < field.length) {
                         if (field[rows][cols] == field[r][c]) {
                             winCols.add(c);
                             winRows.add(r);
